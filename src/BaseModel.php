@@ -27,27 +27,27 @@ class BaseModel extends Model
     /*
      * 排序字段
      */
-    public $order;
+    protected $order;
     /*
      * 初始化返回sql标识0不返回，1返回
      */
-    public $isShowSql;
+    protected $isShowSql;
     /*
      * join 表
      */
-    public $joinTable;
+    protected $joinTable;
     /*
      * join 值
      */
-    public $joinVal;
+    protected $joinVal;
     /*
      * join 方式
      */
-    public $joinType;
+    protected $joinType;
     /*
      * 引入缓存
      */
-    public $cache;
+    protected $cache;
 
     /**
      * BaseModel constructor.
@@ -696,3 +696,4 @@ class BaseModel extends Model
 
 
 }
+

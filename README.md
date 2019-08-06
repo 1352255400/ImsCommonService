@@ -31,5 +31,32 @@ p($re);die;
 use ImsCommonService\CommonService;
 //基础model（加入缓存封装）
 use ImsCommonService\BaseModel;
+使用：
+class DemoModel extends BaseModel
+
+
+
 //基于tp缓存的封装
 use ImsCommonService\TpCacheService;
+使用：
+$cache = new TpCacheService();
+$key = 'demo';
+
+//单key使用
+//写入
+$cache->set($key,time(),20);
+//读取
+$cache->get($key);
+//删除
+$cache->delete($key);
+
+
+//缓存组使用
+$keys = 'demo:';
+for ($i=0; $i < 10; $i++) {
+    //写入
+    $cache->saveWithKey($keys, $key.$i, $i, 100);
+}
+
+//删除
+$cache->delWithKey($keys);
