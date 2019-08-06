@@ -1,6 +1,6 @@
 <?php
 
-namespace TpCacheService.php;
+namespace ImsCommonService;
 
 use think\facade\Cache;
 
