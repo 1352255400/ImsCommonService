@@ -182,7 +182,7 @@ class CommonService
 
         return $data;
     }
-    
+
 
     /**
      * 发送卡片消息
@@ -192,21 +192,21 @@ class CommonService
      * @param $content
      * @return array|mixed
      */
-    public function sendDingMsgCard($userIdList,$content,$msgtype='action_card')
+    public function sendDingMsgCard($userIdList, $content, $msgtype = 'action_card')
     {
         $msg = [];
-        if($msgtype=='action_card'){
+        if ($msgtype == 'action_card') {
             //卡片消息
-            $msg['msgtype']= "action_card";
+            $msg['msgtype'] = "action_card";
             $msg['action_card'] = $content;
-        }else{
-            $msg['msgtype']= "text";
+        } else {
+            $msg['msgtype'] = "text";
             $msg['text'] = $content;
         }
         $data = array();
         $data['agentId'] = env('DING_AGENT_ID');//必填
         $data['sids'] = $userIdList;
-        $data['msg'] = json_encode($msg,JSON_UNESCAPED_UNICODE);
+        $data['msg'] = json_encode($msg, JSON_UNESCAPED_UNICODE);
         $url = $this->CommonServiceDomain . '/message/sendMessageBySids';
         $data = $this->curlRequest($url, 'post', $data, []);
         return $data;
@@ -257,5 +257,42 @@ class CommonService
         $output = curl_exec($ch);
         curl_close($ch);
         return json_decode($output, true);
+    }
+
+    /**
+     * @desc 获取token用户信息
+     * @author W_wang
+     * @since 2019/3/28
+     * @return array|int
+     */
+    public function getTokenInfo($token = '')
+    {
+        //获取token
+        $token = !empty($token) ? $token : request()->header('Authorization');
+        $token = $token ? trim(substr($token, 6)) : '';
+        if (empty($token)) {
+            return ['code' => '1000', 'data' => [], 'msg' => '请传入token'];
+        }
+
+        //获取用户信息
+        $tokenUser = [];
+        if (!empty($token)) {
+            $cache = new TpCacheService();
+            $tokenUser = $cache->get($token);
+            if (empty($tokenUser)) {
+                //通过token获取用户信息（接口）
+                $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
+                $data = curlRequest($url . 'auth/checkAccessToken?accessToken=' . $token);
+                if (isset($data['code']) && $data['code'] == '000') {
+                    //缓存用户信息
+                    $tokenUser = isset($data['data']['userInfo']) ? $data['data']['userInfo'] : [];
+                    $cache->set($token, $tokenUser, 7200);
+                }
+            }
+        }
+        if (empty($tokenUser)) {
+            return ['code' => '1000', 'data' => [], 'msg' => '登录失败'];
+        }
+        return ['code' => '000', 'data' => $tokenUser, 'msg' => '登录失败'];
     }
 }
