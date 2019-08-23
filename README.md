@@ -28,7 +28,7 @@ p($re);die;
 
 3.基本类库
 //公共服务
-use ImsCommonService\CommonService;
+use ImsCommonService\BaseModel;
 //基础model（加入缓存封装）
 use ImsCommonService\BaseModel;
 使用：
