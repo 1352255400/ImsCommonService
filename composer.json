@@ -1,6 +1,6 @@
 {
     "name": "ims/common-service",
-    "description": "信息化公共服务",
+    "description": "信息化公共服务,tp5.1.*",
     "type": "n",
     "license": "MIT",
      "authors": [
