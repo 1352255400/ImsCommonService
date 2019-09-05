@@ -682,12 +682,10 @@ class BaseModel extends Model
     private function initWhere($where = [])
     {
         //检查版本5.0无需处理
-        $version = 5.1;
-        if (method_exists(app::class, 'VERSION')) {
-            $version = app::VERSION;
+        $version = env('TP_VERSION', '51');
+        if ($version == 50) {
+            return $where;
         }
-        $version = str_replace('.', '', substr($version, 0, 3));
-        if ($version == 50) return;
 
         if (!empty($where)) {
             $whereTmp = array();

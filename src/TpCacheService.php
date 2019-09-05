@@ -2,7 +2,7 @@
 
 namespace ImsCommonService;
 
-use think\facade\Cache;
+use think\Cache;
 
 
 /**
