@@ -260,7 +260,7 @@ class CommonService
         if (empty($tokenUser)) {
             return ['code' => '1000', 'data' => [$url], 'msg' => '登录失败'];
         }
-        return ['code' => '000', 'data' => $tokenUser, 'msg' => '登录失败'];
+        return ['code' => '000', 'data' => $tokenUser, 'msg' => 'ok'];
     }
 
     /**
