@@ -6,9 +6,9 @@
 /application/common.php新增env函数
 use think\Env;
 if (!function_exists('env')) {
-    function env($str = '')
+    function env($str = '',$end = '')
     {
-        return Env::get($str,'');
+        return Env::get($str,$end);
     }
 }
 
