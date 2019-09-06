@@ -243,24 +243,22 @@ class CommonService
         }
 
         //获取用户信息
-        $tokenUser = [];
-        if (!empty($token)) {
-            $cache = new TpCacheService();
-            $tokenUser = $cache->get($token);
-            if (empty($tokenUser)) {
-                //通过token获取用户信息（接口）
-                $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
-                $data = $this->curlRequest($url . 'auth/checkAccessToken?accessToken=' . $token);
-                if (isset($data['code']) && $data['code'] == '000') {
-                    //缓存用户信息
-                    $tokenUser = isset($data['data']['userInfo']) ? $data['data']['userInfo'] : [];
-                    $cache->set($token, $tokenUser, 7200);
-                }
+        $cache = new TpCacheService();
+        $tokenUser = $cache->get($token);
+        if (empty($tokenUser)) {
+            //通过token获取用户信息（接口）
+            $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
+            $url = $url . 'auth/checkAccessToken?accessToken=' . $token;
+            $data = $this->curlRequest($url);
+            if (isset($data['code']) && $data['code'] == '000') {
+                //缓存用户信息
+                $tokenUser = isset($data['data']['userInfo']) ? $data['data']['userInfo'] : [];
+                $cache->set($token, $tokenUser, 7200);
             }
         }
 
         if (empty($tokenUser)) {
-            return ['code' => '1000', 'data' => [], 'msg' => '登录失败'];
+            return ['code' => '1000', 'data' => [$url], 'msg' => '登录失败'];
         }
         return ['code' => '000', 'data' => $tokenUser, 'msg' => '登录失败'];
     }
