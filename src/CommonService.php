@@ -328,19 +328,22 @@ class CommonService
      * @author TianChao
      * @since 2019/9/10
      * @param $data
+     * @param $sids
      * @return array
      */
-    public function sendMsgMessage($data)
+    public function sendMsgMessage($data, $sids)
     {
+        //根据sid获取所有人员的电话号码
+        $users_info = $this->getUser(['type' => 'list', 'field' => 'sid', 'value' => $sids]);
+        if (!isset($users_info['code']) || $users_info['code'] != '000') {
+            return ['code' => '500', 'data' => [], 'msg' => '获取人员信息错误'];
+        }
+        //发送短信
         $url = $this->CommonServiceDomain . '/sms/sendSms';
-        $data = $this->curlRequest($url, 'post', $data);
-        if (!isset($data['code'])) {
-            return ['code' => '500', 'data' => [], 'msg' => '短信发送失败,网络异常'];
+        foreach ($users_info as $v) {
+            $data['phoneNum'] = $v['phone'];
+            $this->curlRequest($url, 'post', json_encode($data));
         }
-        if ($data['code'] != '000') {
-            return ['code' => '500', 'data' => [], 'msg' => $data['msg']];
-        }
-        return ['code' => '000', 'data' => [], 'msg' => $data['msg']];
     }
 
 }
