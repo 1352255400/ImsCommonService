@@ -225,7 +225,71 @@ class CommonService
         $url = $this->CommonServiceDomain . '/message/sendMultipleMessages';
         $data = $this->curlRequest($url, 'post', $data);
         return $data;
+    }
 
+    /**
+     * @desc 获取token用户信息
+     * @author W_wang
+     * @since 2019/3/28
+     * @return array|int
+     */
+    public function getTokenInfo($token = '')
+    {
+        //获取token
+        $token = !empty($token) ? $token : request()->header('Authorization');
+        $token = $token ? trim(substr($token, 6)) : '';
+        if (empty($token)) {
+            return ['code' => '1000', 'data' => [], 'msg' => '请传入token'];
+        }
+
+        //获取用户信息
+        $cache = new TpCacheService();
+        $tokenUser = $cache->get($token);
+        if (empty($tokenUser)) {
+            //通过token获取用户信息（接口）
+            $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
+            $url = $url . 'auth/checkAccessToken?accessToken=' . $token;
+            $data = $this->curlRequest($url);
+            if (isset($data['code']) && $data['code'] == '000') {
+                //缓存用户信息
+                $tokenUser = isset($data['data']['userInfo']) ? $data['data']['userInfo'] : [];
+                $cache->set($token, $tokenUser, 7200);
+            }
+        }
+
+        if (empty($tokenUser)) {
+            return ['code' => '1000', 'data' => [$url], 'msg' => '登录失败'];
+        }
+        return ['code' => '000', 'data' => $tokenUser, 'msg' => 'ok'];
+    }
+
+    /**
+     * @desc 退出登录
+     * @author W_wang
+     * @since 2019/8/26
+     * @param string $token
+     * @return array|mixed
+     */
+    public function logout($token = '')
+    {
+        //获取token
+        $token = !empty($token) ? $token : request()->header('Authorization');
+        $token = $token ? trim(substr($token, 6)) : '';
+        if (empty($token)) {
+            return ['code' => '1000', 'data' => [], 'msg' => '请传入token'];
+        }
+
+        //退出登录
+        $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
+        $re = $this->curlRequest($url . 'auth/logout', 'post', json_encode(['accessToken' => $token]));
+        if ($re['code'] != '000') {
+            return $re;
+        }
+
+        //清除缓存
+        $cache = new TpCacheService();
+        $cache->delete($token);
+        return $re;
     }
 
 
@@ -257,43 +321,6 @@ class CommonService
         $output = curl_exec($ch);
         curl_close($ch);
         return json_decode($output, true);
-    }
-
-    /**
-     * @desc 获取token用户信息
-     * @author W_wang
-     * @since 2019/3/28
-     * @return array|int
-     */
-    public function getTokenInfo($token = '')
-    {
-        //获取token
-        $token = !empty($token) ? $token : request()->header('Authorization');
-        $token = $token ? trim(substr($token, 6)) : '';
-        if (empty($token)) {
-            return ['code' => '1000', 'data' => [], 'msg' => '请传入token'];
-        }
-
-        //获取用户信息
-        $tokenUser = [];
-        if (!empty($token)) {
-            $cache = new TpCacheService();
-            $tokenUser = $cache->get($token);
-            if (empty($tokenUser)) {
-                //通过token获取用户信息（接口）
-                $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
-                $data = curlRequest($url . 'auth/checkAccessToken?accessToken=' . $token);
-                if (isset($data['code']) && $data['code'] == '000') {
-                    //缓存用户信息
-                    $tokenUser = isset($data['data']['userInfo']) ? $data['data']['userInfo'] : [];
-                    $cache->set($token, $tokenUser, 7200);
-                }
-            }
-        }
-        if (empty($tokenUser)) {
-            return ['code' => '1000', 'data' => [], 'msg' => '登录失败'];
-        }
-        return ['code' => '000', 'data' => $tokenUser, 'msg' => '登录失败'];
     }
 
     /**

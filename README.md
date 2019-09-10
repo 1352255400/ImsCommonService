@@ -1,6 +1,21 @@
 信息化公共服务
 ===============
 基于tp5进行扩展
+//完美支持tp5.1
+//5.0兼容说明
+/application/common.php新增env函数
+use think\Env;
+if (!function_exists('env')) {
+    function env($str = '',$end = '')
+    {
+        return Env::get($str,$end);
+    }
+}
+
+
+.env 配置：TP_VERSION=50
+
+
 
 基本使用：
 
