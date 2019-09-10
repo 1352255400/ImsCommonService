@@ -340,7 +340,7 @@ class CommonService
         }
         //发送短信
         $url = $this->CommonServiceDomain . '/sms/sendSms';
-        foreach ($users_info as $v) {
+        foreach ($users_info['data'] as $v) {
             $data['phoneNum'] = $v['phone'];
             $this->curlRequest($url, 'post', json_encode($data));
         }
