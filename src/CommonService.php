@@ -295,4 +295,25 @@ class CommonService
         }
         return ['code' => '000', 'data' => $tokenUser, 'msg' => '登录失败'];
     }
+
+    /**
+     * 发送短信服务
+     * @author TianChao
+     * @since 2019/9/10
+     * @param $data
+     * @return array
+     */
+    public function sendMsgMessage($data)
+    {
+        $url = $this->CommonServiceDomain . '/sms/sendSms';
+        $data = $this->curlRequest($url, 'post', $data);
+        if (!isset($data['code'])) {
+            return ['code' => '500', 'data' => [], 'msg' => '短信发送失败,网络异常'];
+        }
+        if ($data['code'] != '000') {
+            return ['code' => '500', 'data' => [], 'msg' => $data['msg']];
+        }
+        return ['code' => '000', 'data' => [], 'msg' => $data['msg']];
+    }
+
 }
