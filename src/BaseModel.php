@@ -57,7 +57,13 @@ class BaseModel extends Model
     {
         parent::__construct();
         $this->joinType = 'left';
-        $this->cache = new TpCacheService();
+        //检查版本5.0无需处理
+        $version = env('TP_VERSION', '51');
+        if ($version == 50) {
+            $this->cache = new Tp50CacheService();
+        } else {
+            $this->cache = new TpCacheService();
+        }
     }
 
 
