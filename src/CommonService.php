@@ -13,12 +13,19 @@ class CommonService
     /*
      * 初始化域名配置
      */
-    private $CommonServiceDomain;
+    private $CommonServiceDomain, $cache;
 
     public function __construct()
     {
         //初始化域名配置
         $this->CommonServiceDomain = env('COMMON_SERVICE_DOMAIN');
+        //检查版本5.0无需处理
+        $version = env('TP_VERSION', '51');
+        if ($version == 50) {
+            $this->cache = new Tp50CacheService();
+        } else {
+            $this->cache = new TpCacheService();
+        }
     }
 
 
@@ -243,8 +250,7 @@ class CommonService
         }
 
         //获取用户信息
-        $cache = new TpCacheService();
-        $tokenUser = $cache->get($token);
+        $tokenUser = $this->cache->get($token);
         if (empty($tokenUser)) {
             //通过token获取用户信息（接口）
             $url = env('PLATFORM_SERVICE_DOMAIN', 'http://platform-service/');
@@ -253,7 +259,7 @@ class CommonService
             if (isset($data['code']) && $data['code'] == '000') {
                 //缓存用户信息
                 $tokenUser = isset($data['data']['userInfo']) ? $data['data']['userInfo'] : [];
-                $cache->set($token, $tokenUser, 7200);
+                $this->cache->set($token, $tokenUser, 7200);
             }
         }
 
@@ -287,8 +293,7 @@ class CommonService
         }
 
         //清除缓存
-        $cache = new TpCacheService();
-        $cache->delete($token);
+        $this->cache->delete($token);
         return $re;
     }
 
