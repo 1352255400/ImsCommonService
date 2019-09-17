@@ -332,17 +332,71 @@ class CommonService
      * 发送短信服务
      * @author TianChao
      * @since 2019/9/10
-     * @param $data
      * @param $sids
+     * @param $type
+     * @param $templateParas
      * @return array
      */
-    public function sendMsgMessage($data, $sids)
+    public function sendMsgMessage($sids, $type, $templateParas)
     {
+        switch ($type) {
+            case 1://已付款待确认
+                $data = [
+                    'code' => 'T021',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            case 2://异常订单
+                $data = [
+                    'code' => 'T020',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            case 3://待发货
+                $data = [
+                    'code' => 'T019',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            case 4://待收货 物流
+                $data = [
+                    'code' => 'T018',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            case 5://待收货 虚拟
+                $data = [
+                    'code' => 'T017',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            case 6://待收货 自提
+                $data = [
+                    'code' => 'T016',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            case 7://商品30天过期
+                $data = [
+                    'code' => 'T015',
+                    'templateParas' => [$templateParas],
+                    'signature' => '潮人公社',
+                ];
+                break;
+            default:
+        }
         //根据sid获取所有人员的电话号码
         $users_info = $this->getUser(['type' => 'list', 'field' => 'sid', 'value' => $sids]);
         if (!isset($users_info['code']) || $users_info['code'] != '000') {
             return ['code' => '500', 'data' => [], 'msg' => '获取人员信息错误'];
         }
+
         //发送短信
         $url = $this->CommonServiceDomain . '/sms/sendSms';
         foreach ($users_info['data'] as $v) {
