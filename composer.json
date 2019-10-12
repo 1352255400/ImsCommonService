@@ -15,7 +15,7 @@
     },
     "autoload": {
     	"psr-4": {
-            "ImsCommonService\\": "src/"
+            "CommonService\\": "src/"
         }
     },
     "repositories": {
