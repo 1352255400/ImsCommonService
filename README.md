@@ -11,6 +11,7 @@
 | use ImsCommonService\TpCacheService;  | 缓存封装（redis）  |
 | use ImsCommonService\CommonService;  | 公共函数  |
 | use ImsCommonService\Code\Code;  | 动态图片验证码  |
+| use ImsCommonService\ExcelService;  | phpexcle(导入、导出)  |
 
 
 ### 基础model use ImsCommonService\BaseModel;
@@ -198,6 +199,42 @@ REDIS_PREFIX = 'demo:';
 			}
 		}
     ?>
+--------
+
+### PHPExcel use ImsCommonService\ExcelService;
+
+> PHPExcel 导入、导出
+
+基本用法：
+```
+composer require ims/common-service 公共新增了phpExcel（导入和导出）
+use ImsCommonService\ExcelService;
+$excle = new  ExcelService();
+
+导入：
+$file = $_FILES['upfile'];//上传方式
+$file = 'file/demo.xlsx';//文件方式
+$data = $excle->import($file);
+
+导出：（多个sheet）
+//导出Excel
+$data = [];
+$data [] = [
+	'name' => '测试1',//sheet名称
+	'title' => ['标题1', '标题2', '标题3'], //表头
+	'data' => [['a1', 'b1', 'c1'], ['aa1', 'bb1', 'cc1']] ,//内容
+	'color' => 'FFCC0001',//字体颜色
+	'color_row' => [['row' => 1, 'col_num' => 1], ['row' => 3, 'col_num' => 2]] //row第几行，col_num列数
+];
+$data [] = [
+	'name' => '测试2',
+	'title' => ['标题11', '标题22', '标题33'],
+	'data' => [['a2', 'b2', 'c2'], ['aa2', 'bb2', 'cc2']],
+];
+//1.文件名，2.文件内容，3.保存地址（不填直接下载）
+$re = $excle->export('demo', $data , 'file/');
+```
+    
 ----
 
 ```
