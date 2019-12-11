@@ -46,6 +46,7 @@ if (!empty($type)) {
         $re = $excle->export('demo', $expTableData);
         exit();
     }
+    //1.文件名，2.文件内容，3.保存地址（不填直接下载）
     $re = $excle->export('demo', $expTableData, 'file/');
     $file = isset($re['data']) ? $re['data'] : '';
 
