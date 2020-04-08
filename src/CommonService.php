@@ -15,6 +15,10 @@ class CommonService
      */
     private $CommonServiceDomain, $cache;
 
+    const REQUEST_FAIL_CODE = '500';
+    const REQUEST_SUCCESS_CODE = '000';
+
+
     public function __construct()
     {
         //初始化域名配置
@@ -404,5 +408,124 @@ class CommonService
             $this->curlRequest($url, 'post', json_encode($data));
         }
     }
+
+
+    /**
+     * 企业微信发送文本工作通知
+     * @author TianChao
+     * @since 2020/4/8
+     * @param int $type 为1是单条发送,为2是批量发送,3发送文本卡片消息,4批量发送文本卡片消息,5发送markdown消息,6批量发送markdown消息
+     * @param array $data
+     * @return array|mixed
+     */
+    public function sendWXMessage($type = 1, $data = [])
+    {
+        if (!$data) {
+            return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "消息数据不能为空！", []);
+        }
+        switch ($type) {
+            case 1://单条发送 文本消息
+                if (!isset($data['content']) || empty($data['content'])) {
+                    return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "单条发送消息内容必传且不能为空！", []);
+                }
+                $url = $this->CommonServiceDomain . '/notify/sendTextMsg';
+                break;
+            case 2://批量发送 文本消息
+                if (!isset($data['textMsgList']) || empty($data['textMsgList'])) {
+                    return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "批量发送消息内容必传且不能为空！", []);
+                }
+                $needFields['content'] = ['文本消息内容', 'require|max:2048'];
+                foreach ($data['textMsgList'] as $dk => $dv) {
+                    foreach ($needFields as $k => $v) {
+                        $val = isset($dv[$k]) ? $dv[$k] : '';
+                        $rule = isset($v[1]) ? $v[1] : '';
+                        $title = isset($v[0]) ? $v[0] : '';
+                        $validate = CommonFunction::customValidate($val, $rule, $title);
+                        if ($validate['code'] != '000') {
+                            return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, $validate['msg']);
+                        }
+                    }
+                }
+                $url = $this->CommonServiceDomain . '/notify/batchSendTextMsg';
+                break;
+            case 3://单条发送文本卡片消息
+                //检查数据
+                $needFields['title'] = ['标题', 'require|max:128'];
+                $needFields['content'] = ['描述', 'require|max:512'];
+                $needFields['url'] = ['点击后跳转的链接', 'require|url'];
+                foreach ($needFields as $k => $v) {
+                    $val = isset($data[$k]) ? $data[$k] : '';
+                    $rule = isset($v[1]) ? $v[1] : '';
+                    $title = isset($v[0]) ? $v[0] : '';
+                    $validate = CommonFunction::customValidate($val, $rule, $title);
+                    if ($validate['code'] != '000') {
+                        return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, $validate['msg']);
+                    }
+                }
+                $url = $this->CommonServiceDomain . '/notify/sendTextCardMsg';
+                break;
+            case 4://批量发送文本卡片消息
+                if (!isset($data['textCardMsgList']) || empty($data['textCardMsgList'])) {
+                    return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "批量发送文本卡片消息内容必传且不能为空！", []);
+                }
+                //检查数据
+                $needFields['title'] = ['标题', 'require|max:128'];
+                $needFields['content'] = ['描述', 'require|max:512'];
+                $needFields['url'] = ['点击后跳转的链接', 'require|url'];
+                foreach ($data['textCardMsgList'] as $dk => $dv) {
+                    foreach ($needFields as $k => $v) {
+                        $val = isset($dv[$k]) ? $dv[$k] : '';
+                        $rule = isset($v[1]) ? $v[1] : '';
+                        $title = isset($v[0]) ? $v[0] : '';
+                        $validate = CommonFunction::customValidate($val, $rule, $title);
+                        if ($validate['code'] != '000') {
+                            return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, $validate['msg']);
+                        }
+                    }
+                }
+                $url = $this->CommonServiceDomain . '/notify/batchSendTextCardMsg';
+                break;
+            case 5://单条发送markdown消息
+                $needFields['content'] = ['markdown内容', 'require|max:2048'];
+                foreach ($needFields as $k => $v) {
+                    $val = isset($data[$k]) ? $data[$k] : '';
+                    $rule = isset($v[1]) ? $v[1] : '';
+                    $title = isset($v[0]) ? $v[0] : '';
+                    $validate = CommonFunction::customValidate($val, $rule, $title);
+                    if ($validate['code'] != '000') {
+                        return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, $validate['msg']);
+                    }
+                }
+                $url = $this->CommonServiceDomain . '/notify/sendMarkdownMsg';
+                break;
+            case 6://批量发送markdown消息
+                if (!isset($data['markdownMsgList']) || empty($data['markdownMsgList'])) {
+                    return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "批量发送markdown消息内容必传且不能为空！", []);
+                }
+                $needFields['content'] = ['markdown内容', 'require|max:2048'];
+                foreach ($data['markdownMsgList'] as $dk => $dv) {
+                    foreach ($needFields as $k => $v) {
+                        $val = isset($dv[$k]) ? $dv[$k] : '';
+                        $rule = isset($v[1]) ? $v[1] : '';
+                        $title = isset($v[0]) ? $v[0] : '';
+                        $validate = CommonFunction::customValidate($val, $rule, $title);
+                        if ($validate['code'] != '000') {
+                            return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, $validate['msg']);
+                        }
+                    }
+                }
+                $url = $this->CommonServiceDomain . '/notify/batchSendMarkdownMsg';
+                break;
+            default:
+                return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "消息发送类型错误！", []);
+        }
+        $send = json_encode($data);//必填
+        $ret = CommonFunction::curlRequest($url, 'post', $send);
+        if (!isset($ret['code']) || $ret['code'] != '000') {
+            return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "消息发送失败!", $ret);
+        }
+        return CommonFunction::returnResult(self::REQUEST_SUCCESS_CODE, "消息发送成功！", []);
+    }
+
 
 }

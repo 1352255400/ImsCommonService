@@ -31,7 +31,7 @@
         },
         "time": "2018-11-22T23:07:24+00:00",
         "type": "library",
-        "installation-source": "dist",
+        "installation-source": "source",
         "autoload": {
             "psr-0": {
                 "PHPExcel": "Classes/"
