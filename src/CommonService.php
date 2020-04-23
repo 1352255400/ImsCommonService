@@ -414,7 +414,7 @@ class CommonService
      * 企业微信发送文本工作通知
      * @author TianChao
      * @since 2020/4/8
-     * @param int $type 为1是单条文本发送,为2是批量文本发送,3发送单条文本卡片消息,4批量发送文本卡片消息,5发送单条markdown消息,6批量发送markdown消息
+     * @param int $type 为1是单条文本发送,为2是批量文本发送,3发送单条文本卡片消息,4批量发送文本卡片消息,5发送单条markdown消息,6批量发送markdown消息，7://单条发送图文消息，8://批量发送图文消息
      * @param array $data
      * @return array|mixed
      */
@@ -442,6 +442,12 @@ class CommonService
                 break;
             case 6://批量发送markdown消息
                 $url .= '/notify/batchSendMarkdownMsg';
+                break;
+            case 7://单条发送图文消息
+                $url .= '/notify/sendPictureTextMsg';
+                break;
+            case 8://批量发送图文消息
+                $url .= '/notify/batchSendPictureTextMsg';
                 break;
             default:
                 return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "消息发送类型错误！", []);
