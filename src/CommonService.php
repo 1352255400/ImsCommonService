@@ -460,5 +460,24 @@ class CommonService
         return CommonFunction::returnResult(self::REQUEST_SUCCESS_CODE, "消息发送成功！", []);
     }
 
+    /**
+     * 新版组织架构通用人员接口,本方法会帮忙参数转json转发，调用方参数不用转json，
+     * 调用方式: CommonService::orgWebApiS(xx,xx,xx),命名空间  ImsCommonService
+     * @author TianChao
+     * @since 2020/5/26
+     * @param $uri
+     * @param string $option
+     * @param array $params
+     * @return mixed
+     */
+    public static function orgWebApiS($uri, $params, $option = 'get')
+    {
+        $url = 'http://org-web' . $uri;
+        $data = CommonFunction::curlRequest($url, $option, json_encode($params));
+        if (isset($data['errCode']) && $data['errCode'] == '0') {
+            return CommonFunction::returnResult(self::REQUEST_SUCCESS_CODE, "获取数据成功！", $data['data']);
+        }
+        return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "获取数据失败！" . $data['errMsg'], []);
+    }
 
 }
