@@ -461,7 +461,7 @@ class CommonService
     }
 
     /**
-     * 新版组织架构通用人员接口,本方法会帮忙参数转json转发，调用方参数不用转json，
+     * 新版组织架构通用接口,本方法会帮忙参数转json转发，调用方参数不用转json，
      * 调用方式: CommonService::orgWebApiS(xx,xx,xx),命名空间  ImsCommonService
      * @author TianChao
      * @since 2020/5/26
