@@ -477,7 +477,9 @@ class CommonService
         if (isset($data['errCode']) && $data['errCode'] == '0') {
             return CommonFunction::returnResult(self::REQUEST_SUCCESS_CODE, "获取数据成功！", $data['data']);
         }
-        return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "获取数据失败！" . $data['errMsg'], []);
+        $error_msg1 = $data['errMsg'] ?? "";
+        $error_msg2 = $data['message'] ?? "";
+        return CommonFunction::returnResult(self::REQUEST_FAIL_CODE, "获取数据失败！" . $error_msg1 . ' ' . $error_msg2, []);
     }
 
 }
